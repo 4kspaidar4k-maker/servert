@@ -8,11 +8,14 @@ const { v4: uuidv4 } = require("uuid");
 const app = express();
 const server = http.createServer(app);
 
-// عرض ملفات مجلد web
-app.use(express.static(path.join(__dirname, "web")));
+// عرض الملفات الموجودة بجانب server.js
+app.use(express.static(__dirname));
+
+// الصفحة الرئيسية
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "web", "index.html"));
+    res.sendFile(path.join(__dirname, "index.html"));
 });
+
 const io = new Server(server, {
     cors: {
         origin: "*"
@@ -50,7 +53,7 @@ app.get("/api/qr", async (req, res) => {
     }
 });
 
-// اتصال Socket.IO
+// Socket.IO
 io.on("connection", (socket) => {
 
     console.log("✅ Client Connected:", socket.id);
@@ -58,14 +61,12 @@ io.on("connection", (socket) => {
     socket.emit("session", currentSession);
 
     socket.on("disconnect", () => {
-
         console.log("❌ Client Disconnected:", socket.id);
-
     });
 
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
 
