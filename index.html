@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PhoneControl</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Cairo',sans-serif;
+}
+
+body{
+
+background:transparent;
+
+color:white;
+
+height:100vh;
+
+overflow:hidden;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+}
+
+/* الخلفية المتحركة ستضيفها أنت */
+
+.container{
+
+width:1600px;
+
+height:900px;
+
+background:rgba(5,10,20,.70);
+
+backdrop-filter:blur(15px);
+
+border:1px solid rgba(0,200,255,.25);
+
+border-radius:25px;
+
+box-shadow:
+
+0 0 40px rgba(0,180,255,.25),
+
+0 0 100px rgba(0,150,255,.08);
+
+padding:30px;
+
+display:grid;
+
+grid-template-columns:360px 1fr;
+
+gap:25px;
+
+}
+
+/* LEFT PANEL */
+
+.left{
+
+display:flex;
+
+flex-direction:column;
+
+gap:18px;
+
+}
+
+.logo{
+
+font-size:35px;
+
+font-weight:bold;
+
+letter-spacing:3px;
+
+color:#00d9ff;
+
+text-shadow:0 0 15px #00d9ff;
+
+margin-bottom:10px;
+
+}
+
+.card{
+
+background:rgba(255,255,255,.04);
+
+border:1px solid rgba(0,180,255,.18);
+
+border-radius:16px;
+
+padding:15px;
+
+transition:.3s;
+
+}
+
+.card:hover{
+
+border-color:#00d9ff;
+
+box-shadow:0 0 20px rgba(0,200,255,.20);
+
+}
+
+.title{
+
+font-size:15px;
+
+color:#8fcfff;
+
+margin-bottom:8px;
+
+}
+
+.value{
+
+font-size:18px;
+
+font-weight:bold;
+
+}
+
+.connected{
+
+color:#00ff88;
+
+}
+
+.waiting{
+
+color:#ffb100;
+
+}
+
+.battery{
+
+width:100%;
+
+height:10px;
+
+background:#1d2936;
+
+border-radius:20px;
+
+overflow:hidden;
+
+margin-top:10px;
+
+}
+
+.battery span{
+
+display:block;
+
+width:75%;
+
+height:100%;
+
+background:linear-gradient(90deg,#00ff99,#00c8ff);
+
+}
+
+.signal{
+
+margin-top:8px;
+
+font-size:18px;
+
+color:#00d9ff;
+
+}
+
+/* RIGHT */
+
+.right{
+
+display:flex;
+
+flex-direction:column;
+
+gap:20px;
+
+}
+
+.top{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+}
+
+.statusBox{
+
+padding:10px 18px;
+
+border-radius:12px;
+
+background:rgba(255,255,255,.05);
+
+border:1px solid rgba(0,180,255,.20);
+
+font-weight:bold;
+
+}
+
+.qrBox{
+
+flex:1;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+background:rgba(255,255,255,.03);
+
+border:2px dashed rgba(0,200,255,.35);
+
+border-radius:25px;
+
+position:relative;
+
+overflow:hidden;
+
+}
+
+#qrcode{
+
+width:320px;
+
+height:320px;
+
+background:white;
+
+border-radius:15px;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+color:black;
+
+font-size:18px;
+
+font-weight:bold;
+
+}
+
+.screen{
+
+position:absolute;
+
+width:100%;
+
+height:100%;
+
+display:none;
+
+justify-content:center;
+
+align-items:center;
+
+font-size:28px;
+
+color:#00d9ff;
+
+}
+
+.logs{
+
+height:180px;
+
+background:rgba(255,255,255,.03);
+
+border-radius:18px;
+
+border:1px solid rgba(0,180,255,.15);
+
+padding:18px;
+
+overflow:auto;
+
+}
+
+.logs h3{
+
+margin-bottom:15px;
+
+color:#00d9ff;
+
+}
+
+.logs p{
+
+margin:6px 0;
+
+font-size:14px;
+
+color:#b7d9ff;
+
+}
+
+.buttons{
+
+display:flex;
+
+gap:15px;
+
+}
+
+.buttons button{
+
+flex:1;
+
+padding:14px;
+
+border:none;
+
+border-radius:12px;
+
+background:linear-gradient(90deg,#00bfff,#007bff);
+
+color:white;
+
+font-size:16px;
+
+cursor:pointer;
+
+transition:.25s;
+
+}
+
+.buttons button:hover{
+
+transform:translateY(-2px);
+
+box-shadow:0 0 18px rgba(0,180,255,.45);
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="left">
+
+<div class="logo">
+PHONE CONTROL
+</div>
+<div class="card">
+    <div class="title">🟢 حالة الاتصال</div>
+    <div class="value waiting" id="connectionStatus">
+        Waiting...
+    </div>
+</div>
+
+<div class="card">
+    <div class="title">🆔 Session ID</div>
+    <div class="value" id="sessionId">
+        ----------
+    </div>
+</div>
+
+<div class="card">
+    <div class="title">📱 Device ID</div>
+    <div class="value" id="deviceId">
+        ----------
+    </div>
+</div>
+
+<div class="card">
+    <div class="title">📱 اسم الجهاز</div>
+    <div class="value" id="deviceName">
+        Waiting...
+    </div>
+</div>
+
+<div class="card">
+    <div class="title">📶 نوع الاتصال</div>
+    <div class="value" id="networkType">
+        Waiting...
+    </div>
+</div>
+
+<div class="card">
+    <div class="title">🌐 عنوان IP</div>
+    <div class="value" id="ipAddress">
+        ---
+    </div>
+</div>
+
+<div class="card">
+
+    <div class="title">
+        🔋 البطارية
+    </div>
+
+    <div class="value" id="batteryText">
+        75%
+    </div>
+
+    <div class="battery">
+        <span id="batteryBar"></span>
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="title">
+        📡 قوة الشبكة
+    </div>
+
+    <div class="signal">
+        📶📶📶📶
+    </div>
+
+</div>
+
+</div>
+
+<div class="right">
+
+<div class="top">
+
+<div class="statusBox">
+    Ready To Connect
+</div>
+
+</div>
+
+<div class="qrBox">
+
+<div id="qrcode">
+
+QR CODE
+
+</div>
+
+<div class="screen" id="screen">
+
+PHONE SCREEN
+
+</div>
+
+</div>
+
+<div class="buttons">
+
+<button id="newQR">
+🔄 Generate QR
+</button>
+
+<button id="disconnect">
+❌ Disconnect
+</button>
+
+<button id="startScreen">
+▶ Start Screen
+</button>
+
+<button id="stopScreen">
+⏹ Stop Screen
+</button>
+
+</div>
+
+<div class="logs">
+
+<h3>
+Activity Logs
+</h3>
+
+<p>[Waiting...]</p>
+
+</div>
+
+</div>
+
+</div>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+const socket = io();
+async function loadQRCode() {
+
+    const response = await fetch("/api/qr");
+
+    const data = await response.json();
+
+    document.getElementById("sessionId").innerText = data.session;
+
+    document.getElementById("qrcode").innerHTML = `
+        <img
+            src="${data.qr}"
+            style="width:100%;height:100%;border-radius:15px;"
+        >
+    `;
+}
+
+loadQRCode();
+const connectionStatus = document.getElementById("connectionStatus");
+const sessionId = document.getElementById("sessionId");
+const deviceId = document.getElementById("deviceId");
+const deviceName = document.getElementById("deviceName");
+const networkType = document.getElementById("networkType");
+const ipAddress = document.getElementById("ipAddress");
+const batteryText = document.getElementById("batteryText");
+const batteryBar = document.getElementById("batteryBar");
+const logs = document.querySelector(".logs");
+
+function addLog(text){
+
+const p = document.createElement("p");
+
+const time = new Date().toLocaleTimeString();
+
+p.innerHTML = "[" + time + "] " + text;
+
+logs.appendChild(p);
+
+logs.scrollTop = logs.scrollHeight;
+
+}
+
+socket.on("connect",()=>{
+
+connectionStatus.innerHTML="🟢 Connected";
+
+connectionStatus.className="value connected";
+
+sessionId.innerHTML=socket.id;
+
+addLog("Connected To Server");
+
+});
+
+socket.on("disconnect",()=>{
+
+connectionStatus.innerHTML="🔴 Disconnected";
+
+connectionStatus.className="value waiting";
+
+addLog("Disconnected");
+
+});
+
+document.getElementById("newQR").onclick=()=>{
+
+addLog("Generate QR Clicked");
+
+}
+
+document.getElementById("disconnect").onclick=()=>{
+
+addLog("Disconnect Button");
+
+}
+
+document.getElementById("startScreen").onclick=()=>{
+
+document.getElementById("screen").style.display="flex";
+
+document.getElementById("qrcode").style.display="none";
+
+addLog("Screen Started");
+
+}
+
+document.getElementById("stopScreen").onclick=()=>{
+
+document.getElementById("screen").style.display="none";
+
+document.getElementById("qrcode").style.display="flex";
+
+addLog("Screen Stopped");
+
+}
+
+/* بيانات تجريبية */
+
+deviceId.innerHTML="PHONE-0001";
+
+deviceName.innerHTML="Android Device";
+
+networkType.innerHTML="Wi-Fi";
+
+ipAddress.innerHTML="Waiting...";
+
+batteryText.innerHTML="92%";
+
+batteryBar.style.width="92%";
+
+</script>
+
+</body>
+</html>
